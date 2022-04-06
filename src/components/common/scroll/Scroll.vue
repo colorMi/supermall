@@ -1,9 +1,9 @@
 <template>
 <!-- ref/children -->
     <div class="wrapper" ref="wrapper">
-        <dir class="content">
+        <div class="content">
             <slot></slot>
-        </dir>
+        </div>
     </div>    
 </template>
 
@@ -17,10 +17,10 @@
                 type:Number,
                 default:0
             },
-            // pullUpLoad:{
-            //     type:Boolean,
-            //     default:false
-            // }
+            pullUpLoad:{
+                type:Boolean,
+                default:false
+            }
         },
         data(){
             return {
@@ -32,18 +32,22 @@
             this.scroll = new BScroll(this.$refs.wrapper,{
                 click:true,
                 probeType:this.probeType,
-                pullUpLoad:this.pullUpLoad
+                pullUpLoad:this.pullUpLoad,
+                keepAlive:true,
             })
 
             //2.监听滚动的位置
-            this.scroll.on('scroll',(position) => {
-                // console.log(position);
-                this.$emit('scroll',position)
-            })
+            if (this.probeType === 2 || this.probeType ===3) {
+                this.scroll.on('scroll',(position) => {
+                    this.$emit('scroll',position)
+                })
+            }
             //3.监听上拉事件
-            // this.scroll.on('pullingUp',() => {
-            //     this.$emit("pullingUp")
-            // })
+            if(this.pullUpLoad){
+                this.scroll.on("pullingUp",() => {
+                    this.$emit("pullingUp")
+                })
+            }
         },
         methods:{
             scrollTo(x,y,time=300){
@@ -53,8 +57,10 @@
                 this.scroll.finishPullUp()
             },
             refresh(){
-                console.log('11111');
                 this.scroll && this.scroll.refresh()
+            },
+            getScrollY(){
+                return this.scroll ? this.scroll.y : 0
             }
         }
     }
